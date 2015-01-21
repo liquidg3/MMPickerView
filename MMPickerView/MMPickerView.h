@@ -15,6 +15,7 @@ extern NSString * const MMbuttonColor;
 extern NSString * const MMfont;
 extern NSString * const MMvalueY;
 extern NSString * const MMselectedObject;
+extern NSString * const MMselectedObject2;
 extern NSString * const MMtoolbarBackgroundImage;
 extern NSString * const MMtextAlignment;
 extern NSString * const MMshowsSelectionIndicator;
@@ -25,6 +26,12 @@ extern NSString * const MMshowsSelectionIndicator;
                 withStrings: (NSArray *)strings
                 withOptions: (NSDictionary *)options
                  completion: (void(^)(NSString *selectedString))completion;
+
++(void)showPickerViewInView: (UIView *)view
+                withStrings: (NSArray *)strings
+                 andStrings: (NSArray *)strings2
+                withOptions: (NSDictionary *)options
+                 completion: (void(^)(NSString *selectedString, NSString *selectedString2))completion;
 
 +(void)showPickerViewInView: (UIView *)view
                 withObjects: (NSArray *)objects

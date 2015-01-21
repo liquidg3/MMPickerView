@@ -89,25 +89,39 @@
                             self.label.text = selectedString;
                           }];
   */
+    
+    
+    [MMPickerView showPickerViewInView:self.view
+                           withStrings:@[@"1", @"2", @"3", @"4"]
+                            andStrings:@[@"cups", @"burritos"]
+                           withOptions:@{MMselectedObject: @"2", MMselectedObject2: @"burritos"}
+                            completion:^(NSString *selectedString, NSString *selectedString2) {
+        
+                                
+                                self.label.text = [NSString stringWithFormat:@"%@ - %@", selectedString, selectedString2];
+                                
+        
+        
+                            }];
   
   
   
   //PickerView with selectedValue functionality, and customized look, with array of strings
-   [MMPickerView showPickerViewInView:self.view
-                          withStrings:_stringsArray
-                          withOptions:@{MMbackgroundColor: [UIColor whiteColor],
-                                        MMtextColor: [UIColor blackColor],
-                                        MMtoolbarColor: [UIColor whiteColor],
-                                        MMbuttonColor: [UIColor blueColor],
-                                        MMfont: [UIFont systemFontOfSize:18],
-                                        MMvalueY: @3,
-                                        MMselectedObject:_selectedString,
-                                        MMtextAlignment:@1}
-                           completion:^(NSString *selectedString) {
-   
-                             _label.text = selectedString;
-                             _selectedString = selectedString;
-   }];
+//   [MMPickerView showPickerViewInView:self.view
+//                          withStrings:_stringsArray
+//                          withOptions:@{MMbackgroundColor: [UIColor whiteColor],
+//                                        MMtextColor: [UIColor blackColor],
+//                                        MMtoolbarColor: [UIColor whiteColor],
+//                                        MMbuttonColor: [UIColor blueColor],
+//                                        MMfont: [UIFont systemFontOfSize:18],
+//                                        MMvalueY: @3,
+//                                        MMselectedObject:_selectedString,
+//                                        MMtextAlignment:@1}
+//                           completion:^(NSString *selectedString) {
+//   
+//                             _label.text = selectedString;
+//                             _selectedString = selectedString;
+//   }];
   
   
   

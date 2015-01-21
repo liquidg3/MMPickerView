@@ -15,6 +15,7 @@ NSString * const MMbuttonColor = @"buttonColor";
 NSString * const MMfont = @"font";
 NSString * const MMvalueY = @"yValueFromTop";
 NSString * const MMselectedObject = @"selectedObject";
+NSString * const MMselectedObject2 = @"selectedObject2";
 NSString * const MMtoolbarBackgroundImage = @"toolbarBackgroundImage";
 NSString * const MMtextAlignment = @"textAlignment";
 NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
@@ -32,12 +33,14 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
 @property (nonatomic, strong) UIButton *pickerDoneButton;
 @property (nonatomic, strong) UIPickerView *pickerView;
 @property (nonatomic, strong) NSArray *pickerViewArray;
+@property (nonatomic, strong) NSArray *pickerViewArray2;
 @property (nonatomic, strong) UIColor *pickerViewTextColor;
 @property (nonatomic, strong) UIFont *pickerViewFont;
 @property (nonatomic, assign) CGFloat yValueFromTop;
 @property (nonatomic, assign) NSInteger pickerViewTextAlignment;
 @property (nonatomic, assign) BOOL pickerViewShowsSelectionIndicator;
 @property (copy) void (^onDismissCompletion)(NSString *);
+@property (copy) void (^onDismissCompletion2)(NSString *, NSString *);
 @property (copy) NSString *(^objectToStringConverter)(id object);
 
 @end
@@ -69,6 +72,29 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
   [self sharedView].onDismissCompletion = completion;
   [view addSubview:[self sharedView]];
   
+}
+
++(void)showPickerViewInView: (UIView *)view
+                withStrings: (NSArray *)strings
+                 andStrings: (NSArray *)strings2
+                withOptions: (NSDictionary *)options
+                 completion: (void(^)(NSString *selectedString, NSString *selectedString2))completion {
+    
+    
+    MMPickerView *v = [self sharedView];
+    v.pickerViewArray2 = strings2;
+    
+    [[self sharedView] initializePickerViewInView:view
+                                        withArray:strings
+                                      withOptions:options];
+
+    
+    [[self sharedView] setPickerHidden:NO callBack:nil];
+    [self sharedView].onDismissCompletion2 = completion;
+    [view addSubview:[self sharedView]];
+    
+    
+    
 }
 
 +(void)showPickerViewInView:(UIView *)view
@@ -121,7 +147,9 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
                    } completion:^(BOOL completed) {
                      if(completed && hidden){
                        [MMPickerView removePickerView];
-                       callBack([self selectedObject]);
+                         if (callBack) {
+                             callBack([self selectedObject]);
+                         }
                      }
                    }];
   
@@ -289,28 +317,32 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
 #pragma mark - UIPickerViewDataSource
 
 - (NSInteger)numberOfComponentsInPickerView: (UIPickerView *)pickerView {
-  return 1;
+    return _pickerViewArray2 == nil ? 1 : 2;
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent: (NSInteger)component {
-  return [_pickerViewArray count];
+    return component == 0 ? [_pickerViewArray count] : [_pickerViewArray2 count];
 }
 
 - (NSString *)pickerView: (UIPickerView *)pickerView
              titleForRow: (NSInteger)row
             forComponent: (NSInteger)component {
+    
+    NSArray *arr = component == 0 ? _pickerViewArray : _pickerViewArray2;
+    
   if (self.objectToStringConverter == nil){
-    return [_pickerViewArray objectAtIndex:row];
+    return [arr objectAtIndex:row];
   } else{
-    return (self.objectToStringConverter ([_pickerViewArray objectAtIndex:row]));
+    return (self.objectToStringConverter ([arr objectAtIndex:row]));
   }
 }
 
 #pragma mark - UIPickerViewDelegate
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+        
   if (self.objectToStringConverter == nil) {
-    self.onDismissCompletion ([_pickerViewArray objectAtIndex:row]);
+      self.onDismissCompletion2 ? self.onDismissCompletion2([self selectedObject], [self selectedObject2]) : self.onDismissCompletion([self selectedObject]);
   } else{
     self.onDismissCompletion (self.objectToStringConverter ([self selectedObject]));
   }
@@ -318,6 +350,10 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
 
 - (id)selectedObject {
   return [_pickerViewArray objectAtIndex: [self.pickerView selectedRowInComponent:0]];
+}
+
+- (id)selectedObject2 {
+    return [_pickerViewArray2 objectAtIndex: [self.pickerView selectedRowInComponent:1]];
 }
 
 - (UIView *)pickerView:(UIPickerView *)pickerView
@@ -359,11 +395,13 @@ NSString * const MMshowsSelectionIndicator = @"showsSelectionIndicator";
       }
     }
   }
+    
+        NSArray *arr = component == 0 ? _pickerViewArray : _pickerViewArray2;
   
   if (self.objectToStringConverter == nil){
-    [pickerViewLabel setText: [_pickerViewArray objectAtIndex:row]];
+    [pickerViewLabel setText: [arr objectAtIndex:row]];
   } else{
-    [pickerViewLabel setText:(self.objectToStringConverter ([_pickerViewArray objectAtIndex:row]))];
+    [pickerViewLabel setText:(self.objectToStringConverter ([arr objectAtIndex:row]))];
   }
   
   return customPickerView;
